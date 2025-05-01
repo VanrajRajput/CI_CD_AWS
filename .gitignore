@@ -177,4 +177,4 @@ ci_cd_env/
 artifact/
 notebook/
 *.txt
-
+sample.ipynb
