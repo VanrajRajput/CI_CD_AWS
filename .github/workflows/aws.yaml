@@ -54,7 +54,6 @@ jobs:
 
       - name: Stop and Remove Existing Container
         run: |
-          # Stop and remove any existing container with the same image or name
           IMAGE="${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest"
           CONTAINER_ID=$(docker ps -q --filter "ancestor=$IMAGE")
           if [ ! -z "$CONTAINER_ID" ]; then
@@ -65,9 +64,19 @@ jobs:
             echo "No existing container found for $IMAGE"
           fi
 
+      - name: Pull Latest Image
+        run: |
+          docker pull "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest"
+
       - name: Run Docker Image to Serve Users
         run: |
-          docker run -d -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
+          docker run -d --name vehicleproj \
+            -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
             -e AWS_DEFAULT_REGION="${{ secrets.AWS_DEFAULT_REGION }}" \
-            -p 5000:5000 "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}":latest
+            -p 5000:5000 "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest"
+
+      - name: Check Container Logs
+        run: |
+          sleep 5 # Wait for container to start
+          docker logs vehicleproj
