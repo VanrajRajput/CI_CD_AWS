@@ -176,5 +176,5 @@ flow.txt
 ci_cd_env/
 artifact/
 notebook/
-
+*.txt
 
