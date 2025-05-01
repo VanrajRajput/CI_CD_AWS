@@ -67,23 +67,9 @@ jobs:
             echo "No existing container to stop for the image '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest'."
           fi
 
-      - name: Pull New Image from ECR and Run on EC2
+      - name: Run New Docker Container
         run: |
-          echo "Pulling new image from ECR..."
-          docker pull "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest"
-
-          # Run the container from the pulled image
-          echo "Deploying new container with the latest image."
-          
-          # Check if the container is already running and stop it if necessary
-          existing_container=$(docker ps -q -f name=app_container)
-          if [ -n "$existing_container" ]; then
-            echo "Stopping the existing container..."
-            docker stop $existing_container
-            docker rm $existing_container
-          fi
-
-          # Run a new container using the latest image
+          echo "Deploying new container with image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest"
           docker run -d \
             --name app_container \
             -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
